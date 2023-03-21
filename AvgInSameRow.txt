@@ -1,0 +1,21 @@
+--create table #Report
+--(SalesChannel	varchar(50)
+--, Week1	int
+--, Week2	int 
+--, Week3	int 
+--, Week4	int 
+--, Week5	int)
+
+--insert into #Report
+--select 'Fleet', 6,	NULL,	14,	15,	13	UNION ALL
+--select 'New', 2,	NULL,	7,	8,	7	 UNION ALL
+--select 'UsedOthers', 12,	NULL,	7,	8, 5 UNION ALL
+--select 'Used', 10, NULL, 4, 4, 3
+
+select * from #Report
+
+SELECT	SalesChannel
+	,	(	SELECT	AVG(CAST(COL AS FLOAT)) 
+			FROM	(VALUES (T.Week1), (T.Week2), (T.Week3), (T.Week4), (T.Week5)) AS V(COL)
+		)	Week5Avg
+FROM	#Report AS T
