@@ -1,0 +1,14 @@
+declare @MinAnniversary int = 5
+
+;WITH cte (ServiceValue)
+AS	(
+		SELECT @MinAnniversary ServiceValue
+	
+		UNION ALL
+	
+		SELECT	servicevalue + 5
+		FROM	cte
+		WHERE	servicevalue < 50
+	)
+
+SELECT * FROM CTE
