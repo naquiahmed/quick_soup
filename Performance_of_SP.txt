@@ -1,0 +1,38 @@
+SELECT TOP 10 query_stats.query_hash AS "Query Hash", 
+query_stats.DBName, query_stats.ObjectName,
+    SUM(query_stats.total_worker_time) / SUM(query_stats.execution_count) AS "Avg CPU Time (micro seconds)",
+    SUM(query_stats.total_worker_time) / SUM(query_stats.execution_count) / 1000000.00 as "Avg CPU Time (seconds)",
+    MIN(query_stats.statement_text) AS "Statement Text",
+    Max(query_stats.execution_count) AS ExecutionCount,
+    Max(Last_Execution_Time) AS LastExecuted,
+    Min(Creation_Time) AS CreationTime,
+    SUM(query_stats.total_elapsed_time) / SUM(query_stats.execution_count) AS "Avg Elapsed Time (micro seconds)",
+    SUM(query_stats.total_elapsed_time) / SUM(query_stats.execution_count) / 1000000.00 as "Avg Elapsed Time (seconds)",
+    SUM(query_stats.total_physical_Reads) / SUM(query_stats.execution_count)  as "Avg PhysicalReads",
+    SUM(query_stats.total_Logical_Reads) / SUM(query_stats.execution_count)  as "Avg LogicalReads",
+    SUM(query_stats.total_Logical_Writes) / SUM(query_stats.execution_count)  as "Avg LogicalWrites",
+    (Max(query_stats.execution_count) * (SUM(query_stats.total_elapsed_time) / SUM(query_stats.execution_count))) / 1000000.00 AS "TotalAvgTime(Seconds)",
+     Min(query_stats.max_elapsed_time)/ 1000000.00 AS MaxElapsedTimeInSeconds
+
+FROM 
+    (SELECT QS.*, 
+    SUBSTRING(ST.text, (QS.statement_start_offset/2) + 1,
+    ((CASE statement_end_offset 
+        WHEN -1 THEN DATALENGTH(ST.text)
+        ELSE QS.statement_end_offset END 
+            - QS.statement_start_offset)/2) + 1) AS statement_text,
+       DB_NAME(ST.DbId) AS DBName,
+       OBJECT_NAME(ST.ObjectId) AS ObjectName
+     FROM sys.dm_exec_query_stats AS QS
+     CROSS APPLY sys.dm_exec_sql_text(QS.sql_handle) as ST
+     --WHERE Creation_Time >= '2014-12-17 12:30:00'
+     ) as query_stats
+WHERE query_stats.DBName = [DB_NAME]
+AND query_stats.ObjectName IN ([STORED_PROC_NAMES])
+GROUP BY query_stats.DBName, query_stats.ObjectName, query_stats.query_hash
+--HAVING Max(query_stats.execution_count) > 1
+--ORDER BY 10 DESC; -- Avg Elapsed Time
+--ORDER BY 13 DESC; -- Logical reads
+--ORDER BY 4 DESC; -- CPU Usage
+--ORDER BY 7 DESC; -- Execution Count
+ORDER BY 3, 15 DESC; -- Avg Total Time
