@@ -1,0 +1,50 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      
+-- Create Date: 
+-- Description: TO DISABLE INDEX BEFORE LOAD AND ENABLE AFTER LOAD OF FACT TABLES
+-- =============================================
+
+ALTER PROCEDURE [dbo].[PROC_DISABLEANDENABLE_FACT_INDEXES]
+(
+@FACT_TABLENAME VARCHAR(100),
+@ISDISABLE BIT
+)
+AS
+BEGIN
+    SET NOCOUNT ON
+	DECLARE @SQL_STRING  VARCHAR(1000)
+	IF @ISDISABLE=1
+		BEGIN
+			
+			select @SQL_STRING=STUFF((SELECT ';'+' ALTER INDEX '+indx.name+' ON '+TBL.name+' DISABLE '
+			from sys.indexes indx
+			inner join sys.tables tbl
+			on tbl.object_id=indx.object_id
+			where tbl.name = 	@FACT_TABLENAME 
+			AND INDX.type_desc='NONCLUSTERED'
+			AND indx.is_disabled=0
+			FOR XML PATH('')),1,1,'')
+
+			--PRINT @SQL_STRING
+			EXEC (@SQL_STRING)
+
+		END
+	ELSE
+		BEGIN
+			select @SQL_STRING=STUFF((select ';'+' ALTER INDEX '+indx.name+' ON '+TBL.name+' REBUILD '
+			from sys.indexes indx
+			inner join sys.tables tbl
+			on tbl.object_id=indx.object_id
+			where tbl.name = 	@FACT_TABLENAME 
+			AND INDX.type_desc='NONCLUSTERED'
+			AND indx.is_disabled=1
+			FOR XML PATH('')),1,1,'')
+
+			--PRINT @SQL_STRING
+			EXEC (@SQL_STRING)
+		END
+END
