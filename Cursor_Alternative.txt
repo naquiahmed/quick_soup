@@ -1,0 +1,16 @@
+	DECLARE @GroupID INT = 111
+	DECLARE	@DealerList TABLE (DealerCode VARCHAR(50), IsProcessed INT DEFAULT(0))
+
+	INSERT INTO @DealerList (DealerCode)
+	SELECT	DealerCode
+	FROM	TblGroupDealer
+	WHERE	GroupID = @GroupID
+
+	DECLARE @DealerCode VARCHAR(50)
+	SET @DealerCode = (SELECT TOP 1 DealerCode FROM @DealerList WHERE IsProcessed = 0)
+
+	WHILE @DealerCode is not null
+	BEGIN
+		UPDATE @DealerList SET IsProcessed = 1 WHERE DealerCode = @DealerCode
+		SET @DealerCode = (SELECT TOP 1 DealerCode FROM @DealerList WHERE IsProcessed = 0)
+	END
