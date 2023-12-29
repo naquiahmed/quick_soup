@@ -1,0 +1,13 @@
+DECLARE	@XMLExample	XML
+
+-----------------------------------------------------------
+SELECT	InputData.AllocationPercentage.value('ModelId[1]', 'INT') ModelID,
+		InputData.AllocationPercentage.value('DiscountAllocation[1]', 'FLOAT') DiscountAllocation 
+FROM		@XMLExample.nodes('/TblAudiRelationshipAllocation/Allocation') AS InputData(AllocationPercentage)
+
+-----------------------------------------------------------
+	
+
+
+
+
