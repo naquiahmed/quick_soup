@@ -1,0 +1,26 @@
+--ALTER TABLE dbo.TemporalTable SET (SYSTEM_VERSIONING = OFF);
+
+--DELETE FROM TemporalTableHistory
+
+--ALTER TABLE dbo.TemporalTable SET 
+--(SYSTEM_VERSIONING = ON
+--(	HISTORY_TABLE = dbo.TempTestHistory,
+--	DATA_CONSISTENCY_CHECK = ON
+--));
+
+--DBCC CHECKIDENT ([TABLE_NAME], reseed, 27)
+
+-----------------------------------------------------------------
+/* CONVERT NORMAL TO TEMPORAL TABLE */
+--ALTER TABLE dbo.[TABLE_NAME] 
+--    ADD 
+--    [COLUMN_NAME_1] datetime2 GENERATED ALWAYS AS ROW START NOT NULL
+--        DEFAULT SYSUTCDATETIME()
+--,
+--    DCHA_VALID_TO_DCHA datetime2 GENERATED ALWAYS AS ROW END NOT NULL
+--        DEFAULT CAST('9999-12-31 23:59:59.9999999' AS datetime2),
+--    PERIOD FOR SYSTEM_TIME ([COLUMN_NAME_1],[COLUMN_NAME_2]);
+
+--ALTER TABLE dbo.[TABLE_NAME]
+--    SET (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.[TABLE_NAME_HISTORY]));
+--GO
