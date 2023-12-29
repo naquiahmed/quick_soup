@@ -1,0 +1,6 @@
+--CREATE FUNCTION fn_EmployeeDetails (@EmpID AS Integer)
+--RETURNS TABLE
+--AS
+--RETURN
+--(SELECT * FROM TblEmployee
+--WHERE EmpID = @EmpID);
